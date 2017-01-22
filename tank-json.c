@@ -41,20 +41,33 @@
 
 #define PORT 6789
 
-typedef struct throttle_state_t {
-	double throttle_l;
-	double throttle_r;
-	double throttle_turret;
-	short direction_r;
-	short direction_l;
-	short direction_turret;
-	short panic_off;
-} throttle_state_t;
-
-
 
 struct jrpc_server tank_server;
 
+
+void move_tank(double move_l, double move_r, double move_t) {
+	int pwm_move_l, pwm_move_r, pwm_move_t;
+	short dir_l, dir_r, dir_t;
+	
+	
+	pwm_move_l = PWM_MAX * abs(move_l);
+	pwm_move_r = PWM_MAX * abs(move_r);
+	pwm_move_t = PWM_MAX * abs(move_t);
+
+	dir_l = move_l < 0 ? 1 : 0;
+	dir_r = move_r < 0 ? 1 : 0;
+	dir_t = move_t < 0 ? 1 : 0;
+	
+	printf("pwm: %i dir: %i\n", pwm_move_l, dir_l);
+	printf("pwm: %i dir: %i\n", pwm_move_r, dir_r);
+	printf("pwm: %i dir: %i\n", pwm_move_t, dir_t);
+	
+	digitalWrite(GROVEPI_PORT_DIRECTION_LEFT, dir_l);
+	digitalWrite(GROVEPI_PORT_DIRECTION_RIGHT, dir_r);
+	analogWrite(GROVEPI_PORT_THROTTLE_LEFT, pwm_move_l);
+	analogWrite(GROVEPI_PORT_THROTTLE_RIGHT, pwm_move_r);
+
+}
 
 void beep(int rep) {
 	int i = 0;
@@ -126,25 +139,6 @@ void init_grove_pi() {
 #endif
 }
 
-void move_tank(double move_l, double move_r, double move_t) {
-	int pwm_move_l, pwm_move_r, pwm_move_t;
-	short dir_l, dir_r, dir_t;
-	
-	
-	pwm_move_l = PWM_MAX * abs(move_l);
-	pwm_move_r = PWM_MAX * abs(move_r);
-	pwm_move_t = PWM_MAX * abs(move_t);
-
-	dir_l = move_l < 0 ? 1 : 0;
-	dir_r = move_r < 0 ? 1 : 0;
-	dir_t = move_t < 0 ? 1 : 0;
-	
-	digitalWrite(GROVEPI_PORT_DIRECTION_LEFT, dir_l);
-	digitalWrite(GROVEPI_PORT_DIRECTION_RIGHT, dir_r);
-	analogWrite(GROVEPI_PORT_THROTTLE_LEFT, pwm_move_l);
-	analogWrite(GROVEPI_PORT_THROTTLE_RIGHT, pwm_move_r);
-
-}
 
 int main(void) {
 	init_grove_pi();
