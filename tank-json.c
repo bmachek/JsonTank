@@ -21,16 +21,11 @@
 
 #define PANIC_BUTTON 1
 
-#define IGNORE_THRESHOLD_THROTTLE 5000
-#define IGNORE_THRESHOLD_ROTATION 0
-#define NO_CHANGE_COUNT_ALARM 10000
-#define NO_CHANGE_COUNT_WARN 8000
-
 #define DIRECTION_FORWARD 1
 #define DIRECTION_BACKWARD 0
 
 #define PWM_MIN 0
-#define PWM_MAX 255
+#define PWM_MAX 64
 
 #define GROVEPI_PORT_THROTTLE_LEFT 5
 #define GROVEPI_PORT_THROTTLE_RIGHT 6
@@ -132,8 +127,23 @@ void init_grove_pi() {
 }
 
 void move_tank(double move_l, double move_r, double move_t) {
+	int pwm_move_l, pwm_move_r, pwm_move_t;
+	short dir_l, dir_r, dir_t;
 	
 	
+	pwm_move_l = PWM_MAX * abs(move_l);
+	pwm_move_r = PWM_MAX * abs(move_r);
+	pwm_move_t = PWM_MAX * abs(move_t);
+
+	dir_l = move_l < 0 ? 1 : 0;
+	dir_r = move_r < 0 ? 1 : 0;
+	dir_t = move_t < 0 ? 1 : 0;
+	
+	digitalWrite(GROVEPI_PORT_DIRECTION_LEFT, dir_l);
+	digitalWrite(GROVEPI_PORT_DIRECTION_RIGHT, dir_r);
+	analogWrite(GROVEPI_PORT_THROTTLE_LEFT, pwm_move_l);
+	analogWrite(GROVEPI_PORT_THROTTLE_RIGHT, pwm_move_r);
+
 }
 
 int main(void) {
