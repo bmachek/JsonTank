@@ -25,10 +25,10 @@
 #define DIRECTION_BACKWARD 0
 
 #define PWM_MIN 0
-#define PWM_MAX 64
+#define PWM_MAX 255
 
-#define GROVEPI_PORT_THROTTLE_LEFT 5
-#define GROVEPI_PORT_THROTTLE_RIGHT 6
+#define GROVEPI_PORT_THROTTLE_LEFT 6
+#define GROVEPI_PORT_THROTTLE_RIGHT 5
 
 #define GROVEPI_PORT_DIRECTION_LEFT 7
 #define GROVEPI_PORT_DIRECTION_RIGHT 8
@@ -46,14 +46,18 @@ struct jrpc_server tank_server;
 
 
 void move_tank(double move_l, double move_r, double move_t) {
-	int pwm_move_l, pwm_move_r, pwm_move_t;
+	double pwm_move_l, pwm_move_r, pwm_move_t;
 	short dir_l, dir_r, dir_t;
 	
 	
-	pwm_move_l = PWM_MAX * abs(move_l);
-	pwm_move_r = PWM_MAX * abs(move_r);
-	pwm_move_t = PWM_MAX * abs(move_t);
+	pwm_move_l = PWM_MAX * move_l;
+	pwm_move_r = PWM_MAX * move_r;
+	pwm_move_t = PWM_MAX * move_t;
 
+	if (pwm_move_l < 0) pwm_move_l = -pwm_move_l;
+	if (pwm_move_r < 0) pwm_move_r = -pwm_move_r;
+	if (pwm_move_t < 0) pwm_move_t = -pwm_move_t;
+	
 	dir_l = move_l < 0 ? 1 : 0;
 	dir_r = move_r < 0 ? 1 : 0;
 	dir_t = move_t < 0 ? 1 : 0;
