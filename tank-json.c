@@ -86,11 +86,11 @@ void full_stop() {
 }
 
 cJSON * move(jrpc_context * ctx, cJSON * pars, cJSON *id) {
-	int move_l = cJSON_GetObjectItem(pars, "move_l")->valueint;
-	int move_r = cJSON_GetObjectItem(pars, "move_r")->valueint;
-	int move_t = cJSON_GetObjectItem(pars, "move_t")->valueint;
-
+	double move_l = cJSON_GetObjectItem(pars, "move_l")->valuedouble;
+	double move_r = cJSON_GetObjectItem(pars, "move_r")->valuedouble;
+	double move_t = cJSON_GetObjectItem(pars, "move_t")->valuedouble;
 	
+	move_tank(move_l, move_r, move_t);	
 	
 	return cJSON_CreateString("Yes sir!");
 }
@@ -131,6 +131,10 @@ void init_grove_pi() {
 #endif
 }
 
+void move_tank(double move_l, double move_r, double move_t) {
+	
+	
+}
 
 int main(void) {
 	init_grove_pi();
