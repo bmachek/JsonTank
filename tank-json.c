@@ -1,3 +1,5 @@
+#define SERVER_PORT 6789
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -54,26 +56,9 @@ typedef struct throttle_state_t {
 	short panic_off;
 } throttle_state_t;
 
-#define SERVER_PORT 6789
+
 
 struct jrpc_server tank_server;
-
-struct throttle_state_t parse_move_json(cJSON *root) {
-	cJSON* name = NULL;
-	cJSON* index = NULL;
-	cJSON* optional = NULL;
-
-	int i;
-
-	cJSON *item = cJSON_GetObjectItem(root, "move");
-	
-	for (i = 0 ; i < cJSON_GetArraySize(item) ; i++) {
-		cJSON * subitem = cJSON_GetArrayItem(item, i);
-		name = cJSON_GetObjectItem(subitem, "name");
-		index = cJSON_GetObjectItem(subitem, "index");
-		optional = cJSON_GetObjectItem(subitem, "optional"); 
-	}
-}
 
 
 void beep(int rep) {
@@ -100,9 +85,13 @@ void full_stop() {
 	// exit(0);
 }
 
-cJSON * process_movement(jrpc_context * ctx, cJSON * pars, cJSON *id) {
-	// struct throttle_state_t results = parse_move_json(pars);
-	beep(10);
+cJSON * move(jrpc_context * ctx, cJSON * pars, cJSON *id) {
+	int move_l = cJSON_GetObjectItem(pars, "move_l")->valueint;
+	int move_r = cJSON_GetObjectItem(pars, "move_r")->valueint;
+	int move_t = cJSON_GetObjectItem(pars, "move_t")->valueint;
+
+	
+	
 	return cJSON_CreateString("Yes sir!");
 }
 
@@ -114,6 +103,8 @@ cJSON * stop_n_quit(jrpc_context * ctx, cJSON * pars, cJSON *id) {
 
 cJSON * test(jrpc_context * ctx, cJSON * pars, cJSON *id) {
 	beep(3);
+	printf("JSON String pars : %s\n", cJSON_Print(pars));
+	printf("JSON String id : %s\n", cJSON_Print(id));
 	return cJSON_CreateString("I'm here, what do you want.");
 }
 
@@ -145,7 +136,7 @@ int main(void) {
 	init_grove_pi();
 	
 	jrpc_server_init(&tank_server, SERVER_PORT);
-	jrpc_register_procedure(&tank_server, process_movement, "move", NULL );
+	jrpc_register_procedure(&tank_server, move, "move", NULL );
 	jrpc_register_procedure(&tank_server, stop_n_quit, "stopnquit", NULL );
 	jrpc_register_procedure(&tank_server, test, "test", NULL );
 	jrpc_server_run(&tank_server);
