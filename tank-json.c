@@ -24,7 +24,7 @@
 #define DIRECTION_FORWARD 1
 #define DIRECTION_BACKWARD 0
 
-#define PWM_MIN 0
+#define PWM_MIN 48
 #define PWM_MAX 255
 
 #define GROVEPI_PORT_THROTTLE_LEFT 6
@@ -50,9 +50,9 @@ void move_tank(double move_l, double move_r, double move_t) {
 	short dir_l, dir_r, dir_t;
 	
 	
-	pwm_move_l = PWM_MAX * move_l;
-	pwm_move_r = PWM_MAX * move_r;
-	pwm_move_t = PWM_MAX * move_t;
+	pwm_move_l = (PWM_MAX - PWM_MIN) * move_l + PWM_MIN;
+	pwm_move_r = (PWM_MAX - PWM_MIN) * move_r + PWM_MIN;
+	pwm_move_t = (PWM_MAX - PWM_MIN) * move_t + PWM_MIN;
 
 	if (pwm_move_l < 0) pwm_move_l = -pwm_move_l;
 	if (pwm_move_r < 0) pwm_move_r = -pwm_move_r;
