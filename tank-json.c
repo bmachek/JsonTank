@@ -110,7 +110,7 @@ cJSON * move(jrpc_context * ctx, cJSON * pars, cJSON *id) {
 cJSON * stop_n_quit(jrpc_context * ctx, cJSON * pars, cJSON *id) {
 	full_stop();
 	jrpc_server_stop(&tank_server);
-	return cJSON_CreateString("War's finally over!");
+	return cJSON_CreateString("I quit!");
 }
 
 cJSON * test(jrpc_context * ctx, cJSON * pars, cJSON *id) {
@@ -154,7 +154,7 @@ int main(void) {
 	jrpc_server_run(&tank_server);
 	jrpc_server_destroy(&tank_server);
 	
-	printf("War is over!\n");
+	printf("Peace at last!\n");
 	
 	return 0;
 }
