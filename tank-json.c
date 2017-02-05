@@ -15,10 +15,6 @@
 #include <jsonrpc-c.h>
 #include <grovepi.h>
 
-#define MAX_THROTTLE_VALUE 32768
-#define MAX_ROTATION_VALUE 32768
-#define MAX_TURRET_VALUE 32768
-
 #define PANIC_BUTTON 1
 
 #define DIRECTION_FORWARD 1
@@ -38,9 +34,6 @@
 #define GROVEPI_PORT_TURRET_DIR_2 4
 
 #define GROVEPI_PORT_BUZZER 15 // Port A1
-
-#define PORT 6789
-
 
 struct jrpc_server tank_server;
 
