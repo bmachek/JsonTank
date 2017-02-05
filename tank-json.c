@@ -55,9 +55,9 @@ void move_tank(double move_l, double move_r, double move_t) {
 	dir_r = move_r < 0 ? 1 : 0;
 	dir_t = move_t < 0 ? 1 : 0;
 	
-	printf("pwm: %i dir: %i\n", pwm_move_l, dir_l);
-	printf("pwm: %i dir: %i\n", pwm_move_r, dir_r);
-	printf("pwm: %i dir: %i\n", pwm_move_t, dir_t);
+	printf("pwm_l: %i dir: %i\n", pwm_move_l, dir_l);
+	printf("pwm_r: %i dir: %i\n", pwm_move_r, dir_r);
+	printf("pwm_t: %i dir: %i\n", pwm_move_t, dir_t);
 	
 	digitalWrite(GROVEPI_PORT_DIRECTION_LEFT, dir_l);
 	digitalWrite(GROVEPI_PORT_DIRECTION_RIGHT, dir_r);
