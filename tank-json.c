@@ -1,6 +1,7 @@
 #define SERVER_PORT 6789
 
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
@@ -15,17 +16,13 @@
 #include <jsonrpc-c.h>
 #include <grovepi.h>
 
-#define MAX_THROTTLE_VALUE 32768
-#define MAX_ROTATION_VALUE 32768
-#define MAX_TURRET_VALUE 32768
-
 #define PANIC_BUTTON 1
 
 #define DIRECTION_FORWARD 1
 #define DIRECTION_BACKWARD 0
 
-#define PWM_MIN 48
-#define PWM_MAX 255
+#define PWM_MIN 0.0
+#define PWM_MAX 255.0
 
 #define GROVEPI_PORT_THROTTLE_LEFT 6
 #define GROVEPI_PORT_THROTTLE_RIGHT 5
@@ -39,9 +36,6 @@
 
 #define GROVEPI_PORT_BUZZER 15 // Port A1
 
-#define PORT 6789
-
-
 struct jrpc_server tank_server;
 
 
@@ -49,22 +43,22 @@ void move_tank(double move_l, double move_r, double move_t) {
 	double pwm_move_l, pwm_move_r, pwm_move_t;
 	short dir_l, dir_r, dir_t;
 	
-	
-	pwm_move_l = (PWM_MAX - PWM_MIN) * move_l + PWM_MIN;
-	pwm_move_r = (PWM_MAX - PWM_MIN) * move_r + PWM_MIN;
-	pwm_move_t = (PWM_MAX - PWM_MIN) * move_t + PWM_MIN;
-
-	if (pwm_move_l < 0) pwm_move_l = -pwm_move_l;
-	if (pwm_move_r < 0) pwm_move_r = -pwm_move_r;
-	if (pwm_move_t < 0) pwm_move_t = -pwm_move_t;
-	
 	dir_l = move_l < 0 ? 1 : 0;
 	dir_r = move_r < 0 ? 1 : 0;
 	dir_t = move_t < 0 ? 1 : 0;
-	
-	printf("pwm: %i dir: %i\n", pwm_move_l, dir_l);
-	printf("pwm: %i dir: %i\n", pwm_move_r, dir_r);
-	printf("pwm: %i dir: %i\n", pwm_move_t, dir_t);
+
+	move_l = move_l * move_l;
+	move_r = move_r * move_r;
+	move_t = move_t * move_t;
+
+
+	pwm_move_l = move_l != 0 ? ((PWM_MAX - PWM_MIN) * move_l + PWM_MIN) : 0;
+	pwm_move_r = move_r != 0 ? ((PWM_MAX - PWM_MIN) * move_r + PWM_MIN) : 0;
+	pwm_move_t = move_t != 0 ? ((PWM_MAX - PWM_MIN) * move_t + PWM_MIN) : 0;
+
+	printf("pwm_l: %f dir: %i\n", pwm_move_l, dir_l);
+	printf("pwm_r: %f dir: %i\n", pwm_move_r, dir_r);
+	printf("pwm_t: %f dir: %i\n", pwm_move_t, dir_t);
 	
 	digitalWrite(GROVEPI_PORT_DIRECTION_LEFT, dir_l);
 	digitalWrite(GROVEPI_PORT_DIRECTION_RIGHT, dir_r);
