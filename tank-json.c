@@ -1,6 +1,7 @@
 #define SERVER_PORT 6789
 
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
@@ -20,7 +21,7 @@
 #define DIRECTION_FORWARD 1
 #define DIRECTION_BACKWARD 0
 
-#define PWM_MIN 16.0
+#define PWM_MIN 0.0
 #define PWM_MAX 255.0
 
 #define GROVEPI_PORT_THROTTLE_LEFT 6
@@ -46,17 +47,18 @@ void move_tank(double move_l, double move_r, double move_t) {
 	dir_r = move_r < 0 ? 1 : 0;
 	dir_t = move_t < 0 ? 1 : 0;
 
-	move_l = fabs(move_l);
-	move_r = fabs(move_r);
-	move_t = fabs(move_t);
-	
+	move_l = move_l * move_l;
+	move_r = move_r * move_r;
+	move_t = move_t * move_t;
+
+
 	pwm_move_l = move_l != 0 ? ((PWM_MAX - PWM_MIN) * move_l + PWM_MIN) : 0;
 	pwm_move_r = move_r != 0 ? ((PWM_MAX - PWM_MIN) * move_r + PWM_MIN) : 0;
 	pwm_move_t = move_t != 0 ? ((PWM_MAX - PWM_MIN) * move_t + PWM_MIN) : 0;
 
-	printf("pwm_l: %f dir: %f\n", pwm_move_l, dir_l);
-	printf("pwm_r: %f dir: %f\n", pwm_move_r, dir_r);
-	printf("pwm_t: %f dir: %f\n", pwm_move_t, dir_t);
+	printf("pwm_l: %f dir: %i\n", pwm_move_l, dir_l);
+	printf("pwm_r: %f dir: %i\n", pwm_move_r, dir_r);
+	printf("pwm_t: %f dir: %i\n", pwm_move_t, dir_t);
 	
 	digitalWrite(GROVEPI_PORT_DIRECTION_LEFT, dir_l);
 	digitalWrite(GROVEPI_PORT_DIRECTION_RIGHT, dir_r);
