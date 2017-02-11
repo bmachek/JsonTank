@@ -16,7 +16,6 @@
 #include <jsonrpc-c.h>
 #include <grovepi.h>
 
-#define PANIC_BUTTON 1
 
 #define DIRECTION_FORWARD 1
 #define DIRECTION_BACKWARD 0
@@ -34,7 +33,7 @@
 #define GROVEPI_PORT_TURRET_DIR_1 2
 #define GROVEPI_PORT_TURRET_DIR_2 4
 
-#define GROVEPI_PORT_BUZZER 15 // Port A1
+#define GROVEPI_PORT_BUZZER 15
 
 struct jrpc_server tank_server;
 
@@ -62,8 +61,10 @@ void move_tank(double move_l, double move_r, double move_t) {
 	
 	digitalWrite(GROVEPI_PORT_DIRECTION_LEFT, dir_l);
 	digitalWrite(GROVEPI_PORT_DIRECTION_RIGHT, dir_r);
+	digitalWrite(GROVEPI_PORT_TURRET_DIR_1, dir_t);
 	analogWrite(GROVEPI_PORT_THROTTLE_LEFT, pwm_move_l);
 	analogWrite(GROVEPI_PORT_THROTTLE_RIGHT, pwm_move_r);
+	analogWrite(GROVEPI_PORT_TURRET, pwm_move_t);
 
 }
 
