@@ -48,7 +48,13 @@ void move_tank(double move_l, double move_r, double move_t) {
 
 	move_l = move_l * move_l;
 	move_r = move_r * move_r;
+	/*
 	move_t = move_t * move_t;
+	*/
+	
+	move_l = move_l < 0 ? -move_l : move_l;
+	move_r = move_r < 0 ? -move_r : move_r;
+	move_t = move_t < 0 ? -move_t : move_t;
 
 
 	pwm_move_l = move_l != 0 ? ((PWM_MAX - PWM_MIN) * move_l + PWM_MIN) : 0;
@@ -61,7 +67,8 @@ void move_tank(double move_l, double move_r, double move_t) {
 	
 	digitalWrite(GROVEPI_PORT_DIRECTION_LEFT, dir_l);
 	digitalWrite(GROVEPI_PORT_DIRECTION_RIGHT, dir_r);
-	digitalWrite(GROVEPI_PORT_TURRET_DIR_1, dir_t);
+	digitalWrite(GROVEPI_PORT_TURRET_DIR_1, dir_t == 1 ? 0 : 1);
+	digitalWrite(GROVEPI_PORT_TURRET_DIR_2, dir_t == 1 ? 1 : 0);
 	analogWrite(GROVEPI_PORT_THROTTLE_LEFT, pwm_move_l);
 	analogWrite(GROVEPI_PORT_THROTTLE_RIGHT, pwm_move_r);
 	analogWrite(GROVEPI_PORT_TURRET, pwm_move_t);
