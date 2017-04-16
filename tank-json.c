@@ -109,10 +109,20 @@ cJSON * move(jrpc_context * ctx, cJSON * pars, cJSON *id) {
 	return cJSON_CreateString("Yes sir!");
 }
 
+cJSON * stop(jrpc_context * ctx, cJSON * pars, cJSON *id) {
+	full_stop();
+	return cJSON_CreateString("Stopping!");
+}
+
 cJSON * stop_n_quit(jrpc_context * ctx, cJSON * pars, cJSON *id) {
 	full_stop();
 	jrpc_server_stop(&tank_server);
 	return cJSON_CreateString("I quit!");
+}
+
+cJSON * start_hd_cam(jrpc_context * ctx, cJSON * pars, cJSON *id) {
+	system("/usr/local/sbin/start_hd_cam.sh &");
+	return cJSON_CreateString("Streaming for you sir!");
 }
 
 cJSON * test(jrpc_context * ctx, cJSON * pars, cJSON *id) {
@@ -153,6 +163,8 @@ int main(void) {
 	jrpc_register_procedure(&tank_server, move, "move", NULL );
 	jrpc_register_procedure(&tank_server, stop_n_quit, "stopnquit", NULL );
 	jrpc_register_procedure(&tank_server, test, "test", NULL );
+	jrpc_register_procedure(&tank_server, stop, "fullstop", NULL );
+	jrpc_register_procedure(&tank_server, start_hd_cam, "hd_cam", NULL );
 	jrpc_server_run(&tank_server);
 	jrpc_server_destroy(&tank_server);
 	
