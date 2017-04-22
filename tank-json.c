@@ -15,6 +15,8 @@
 #include <signal.h>
 #include <jsonrpc-c.h>
 #include <grovepi.h>
+#include <time.h>
+#include <pthread.h>
 
 
 #define DIRECTION_FORWARD 1
@@ -36,6 +38,8 @@
 #define GROVEPI_PORT_BUZZER 15
 
 struct jrpc_server tank_server;
+time_t last_command;
+pthread_t watchdog_thread;
 
 
 void move_tank(double move_l, double move_r, double move_t) {
@@ -100,6 +104,8 @@ void full_stop() {
 }
 
 cJSON * move(jrpc_context * ctx, cJSON * pars, cJSON *id) {
+	last_command = time(NULL);
+	
 	double move_l = cJSON_GetObjectItem(pars, "move_l")->valuedouble;
 	double move_r = cJSON_GetObjectItem(pars, "move_r")->valuedouble;
 	double move_t = cJSON_GetObjectItem(pars, "move_t")->valuedouble;
@@ -155,9 +161,24 @@ void init_grove_pi() {
 #endif
 }
 
+void watchdog() {
+	while (1) {
+		if (time(NULL) - last_command > 3) {
+			printf("Haven't heard from you in a while. Stopping!\n");
+			full_stop();
+			last_command = time(NULL);
+		}
+		sleep(1);
+	}
+}
+
 
 int main(void) {
 	init_grove_pi();
+	
+	last_command = time(NULL);
+	
+	pthread_create(&watchdog_thread, NULL, (void *) &watchdog, NULL);
 	
 	jrpc_server_init(&tank_server, SERVER_PORT);
 	jrpc_register_procedure(&tank_server, move, "move", NULL );
@@ -166,7 +187,10 @@ int main(void) {
 	jrpc_register_procedure(&tank_server, stop, "fullstop", NULL );
 	jrpc_register_procedure(&tank_server, start_hd_cam, "hd_cam", NULL );
 	jrpc_server_run(&tank_server);
+	
 	jrpc_server_destroy(&tank_server);
+	
+	pthread_join(watchdog_thread, NULL);
 	
 	printf("Peace at last!\n");
 	
