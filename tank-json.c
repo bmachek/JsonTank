@@ -99,7 +99,7 @@ void full_stop() {
 	digitalWrite(GROVEPI_PORT_TURRET_DIR_1, 1);
 	digitalWrite(GROVEPI_PORT_TURRET_DIR_2, 1);
 #endif
-	beep(5);
+	// beep(5);
 	// exit(0);
 }
 
