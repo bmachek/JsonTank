@@ -126,11 +126,6 @@ cJSON * stop_n_quit(jrpc_context * ctx, cJSON * pars, cJSON *id) {
 	return cJSON_CreateString("I quit!");
 }
 
-cJSON * start_hd_cam(jrpc_context * ctx, cJSON * pars, cJSON *id) {
-	system("/usr/local/sbin/start_hd_cam.sh &");
-	return cJSON_CreateString("Streaming for you sir!");
-}
-
 cJSON * test(jrpc_context * ctx, cJSON * pars, cJSON *id) {
 	beep(3);
 	printf("JSON String pars : %s\n", cJSON_Print(pars));
@@ -164,7 +159,7 @@ void init_grove_pi() {
 void watchdog() {
 	while (1) {
 		if (time(NULL) - last_command > 3) {
-			printf("Haven't heard from you in a while. Stopping!\n");
+			// printf("Haven't heard from you in a while. Stopping!\n");
 			full_stop();
 			last_command = time(NULL);
 		}
@@ -172,6 +167,12 @@ void watchdog() {
 	}
 }
 
+
+cJSON * restart_cam_services() {
+	system("systemctl restart turret-cam.service");
+	system("systemctl restart body-cam.service");
+	return cJSON_CreateString("Cam services restarted.");
+}
 
 int main(void) {
 	init_grove_pi();
@@ -185,7 +186,7 @@ int main(void) {
 	jrpc_register_procedure(&tank_server, stop_n_quit, "stopnquit", NULL );
 	jrpc_register_procedure(&tank_server, test, "test", NULL );
 	jrpc_register_procedure(&tank_server, stop, "fullstop", NULL );
-	jrpc_register_procedure(&tank_server, start_hd_cam, "hd_cam", NULL );
+	jrpc_register_procedure(&tank_server, restart_cam_services, "restart_cams", NULL );
 	jrpc_server_run(&tank_server);
 	
 	jrpc_server_destroy(&tank_server);
