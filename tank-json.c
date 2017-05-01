@@ -49,17 +49,10 @@ void move_tank(double move_l, double move_r, double move_t) {
 	dir_l = move_l < 0 ? 1 : 0;
 	dir_r = move_r < 0 ? 1 : 0;
 	dir_t = move_t < 0 ? 1 : 0;
-
-	move_l = move_l * move_l;
-	move_r = move_r * move_r;
-	/*
-	move_t = move_t * move_t;
-	*/
 	
 	move_l = move_l < 0 ? -move_l : move_l;
 	move_r = move_r < 0 ? -move_r : move_r;
 	move_t = move_t < 0 ? -move_t : move_t;
-
 
 	pwm_move_l = move_l != 0 ? ((PWM_MAX - PWM_MIN) * move_l + PWM_MIN) : 0;
 	pwm_move_r = move_r != 0 ? ((PWM_MAX - PWM_MIN) * move_r + PWM_MIN) : 0;
@@ -174,6 +167,11 @@ cJSON * restart_cam_services() {
 	return cJSON_CreateString("Cam services restarted.");
 }
 
+cJSON * reboot() {
+	system("reboot");
+	return cJSON_CreateString("See you soon.");
+}
+
 int main(void) {
 	init_grove_pi();
 	
@@ -187,6 +185,7 @@ int main(void) {
 	jrpc_register_procedure(&tank_server, test, "test", NULL );
 	jrpc_register_procedure(&tank_server, stop, "fullstop", NULL );
 	jrpc_register_procedure(&tank_server, restart_cam_services, "restart_cams", NULL );
+	jrpc_register_procedure(&tank_server, reboot, "reboot", NULL );
 	jrpc_server_run(&tank_server);
 	
 	jrpc_server_destroy(&tank_server);
@@ -194,6 +193,8 @@ int main(void) {
 	pthread_join(watchdog_thread, NULL);
 	
 	printf("Peace at last!\n");
+	
+	full_stop();
 	
 	return 0;
 }
