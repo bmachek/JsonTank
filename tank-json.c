@@ -43,6 +43,7 @@ struct jrpc_server tank_server;
 time_t last_command;
 pthread_t watchdog_thread, cannoneer_thread;
 int pending_shoot = 0;
+int currently_shooting = 0;
 
 
 void move_tank(double move_l, double move_r, double move_t) {
@@ -94,7 +95,6 @@ void full_stop() {
 	analogWrite(GROVEPI_PORT_TURRET, 0);
 	digitalWrite(GROVEPI_PORT_TURRET_DIR_1, 1);
 	digitalWrite(GROVEPI_PORT_TURRET_DIR_2, 1);
-	digitalWrite(GROVEPI_PORT_GUN, 0);
 #endif
 	// beep(5);
 	// exit(0);
@@ -177,23 +177,34 @@ cJSON * reboot() {
 }
 
 cJSON * initiate_shoot() {
-	pending_shoot = 1;
-	return cJSON_CreateString("Kaawwooom");
+	if (currently_shooting == 0) {
+		pending_shoot = 1;
+		printf("Got shoot order\n");
+		return cJSON_CreateString("Kaawwooom");
+	} else {
+		printf("We only have one gun!\n");
+		return cJSON_CreateString("Calm down!");
+	}
+	
 }
 
 
 void shoot_now() {
+	currently_shooting = 1;
 	digitalWrite(GROVEPI_PORT_GUN, 1);
 	sleep(7);
 	digitalWrite(GROVEPI_PORT_GUN, 0);
+	currently_shooting = 0;
+	printf("Shoot order completed.\n");
 }
 
 void cannoneer() {
 	while (1) {
-		if (pending_shoot == 1) {
+		if (pending_shoot == 1 && ! currently_shooting) {
 			pending_shoot = 0;
 			shoot_now();
 		}
+		sleep(0.1);
 	}
 }
 
