@@ -35,11 +35,14 @@
 #define GROVEPI_PORT_TURRET_DIR_1 2
 #define GROVEPI_PORT_TURRET_DIR_2 4
 
+#define GROVEPI_PORT_GUN 16
+
 #define GROVEPI_PORT_BUZZER 15
 
 struct jrpc_server tank_server;
 time_t last_command;
-pthread_t watchdog_thread;
+pthread_t watchdog_thread, cannoneer_thread;
+int pending_shoot = 0;
 
 
 void move_tank(double move_l, double move_r, double move_t) {
@@ -91,6 +94,7 @@ void full_stop() {
 	analogWrite(GROVEPI_PORT_TURRET, 0);
 	digitalWrite(GROVEPI_PORT_TURRET_DIR_1, 1);
 	digitalWrite(GROVEPI_PORT_TURRET_DIR_2, 1);
+	digitalWrite(GROVEPI_PORT_GUN, 0);
 #endif
 	// beep(5);
 	// exit(0);
@@ -136,6 +140,7 @@ void init_grove_pi() {
 	pinMode(GROVEPI_PORT_DIRECTION_RIGHT,1);
 
 	pinMode(GROVEPI_PORT_BUZZER, 1);
+	pinMode(GROVEPI_PORT_GUN, 1);
 
 	pinMode(GROVEPI_PORT_TURRET,1);
 	pinMode(GROVEPI_PORT_TURRET_DIR_1,1);
@@ -160,7 +165,6 @@ void watchdog() {
 	}
 }
 
-
 cJSON * restart_cam_services() {
 	system("systemctl restart turret-cam.service");
 	system("systemctl restart body-cam.service");
@@ -172,12 +176,35 @@ cJSON * reboot() {
 	return cJSON_CreateString("See you soon.");
 }
 
+cJSON * initiate_shoot() {
+	pending_shoot = 1;
+	return cJSON_CreateString("Kaawwooom");
+}
+
+
+void shoot_now() {
+	digitalWrite(GROVEPI_PORT_GUN, 1);
+	sleep(7);
+	digitalWrite(GROVEPI_PORT_GUN, 0);
+}
+
+void cannoneer() {
+	while (1) {
+		if (pending_shoot == 1) {
+			pending_shoot = 0;
+			shoot_now();
+		}
+	}
+}
+
+
 int main(void) {
 	init_grove_pi();
 	
 	last_command = time(NULL);
 	
 	pthread_create(&watchdog_thread, NULL, (void *) &watchdog, NULL);
+	pthread_create(&cannoneer_thread, NULL, (void *) &cannoneer, NULL);
 	
 	jrpc_server_init(&tank_server, SERVER_PORT);
 	jrpc_register_procedure(&tank_server, move, "move", NULL );
@@ -186,11 +213,13 @@ int main(void) {
 	jrpc_register_procedure(&tank_server, stop, "fullstop", NULL );
 	jrpc_register_procedure(&tank_server, restart_cam_services, "restart_cams", NULL );
 	jrpc_register_procedure(&tank_server, reboot, "reboot", NULL );
+	jrpc_register_procedure(&tank_server, initiate_shoot, "shoot", NULL );
 	jrpc_server_run(&tank_server);
 	
 	jrpc_server_destroy(&tank_server);
 	
 	pthread_join(watchdog_thread, NULL);
+	pthread_join(cannoneer_thread, NULL);
 	
 	printf("Peace at last!\n");
 	
