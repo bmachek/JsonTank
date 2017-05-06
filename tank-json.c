@@ -192,7 +192,7 @@ cJSON * initiate_shoot() {
 void shoot_now() {
 	currently_shooting = 1;
 	digitalWrite(GROVEPI_PORT_GUN, 1);
-	sleep(7);
+	usleep(1800);
 	digitalWrite(GROVEPI_PORT_GUN, 0);
 	currently_shooting = 0;
 	printf("Shoot order completed.\n");
@@ -204,7 +204,7 @@ void cannoneer() {
 			pending_shoot = 0;
 			shoot_now();
 		}
-		sleep(0.1);
+		usleep(200);
 	}
 }
 
