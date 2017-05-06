@@ -68,11 +68,16 @@ void move_tank(double move_l, double move_r, double move_t) {
 	
 	digitalWrite(GROVEPI_PORT_DIRECTION_LEFT, dir_l);
 	digitalWrite(GROVEPI_PORT_DIRECTION_RIGHT, dir_r);
-	digitalWrite(GROVEPI_PORT_TURRET_DIR_1, dir_t == 1 ? 0 : 1);
-	digitalWrite(GROVEPI_PORT_TURRET_DIR_2, dir_t == 1 ? 1 : 0);
+	if (move_t != 0) {
+		digitalWrite(GROVEPI_PORT_TURRET_DIR_1, dir_t == 1 ? 0 : 1);
+		digitalWrite(GROVEPI_PORT_TURRET_DIR_2, dir_t == 1 ? 1 : 0);
+	} else {
+		digitalWrite(GROVEPI_PORT_TURRET_DIR_1, 0);
+                digitalWrite(GROVEPI_PORT_TURRET_DIR_2, 0);
+	}
 	analogWrite(GROVEPI_PORT_THROTTLE_LEFT, pwm_move_l);
 	analogWrite(GROVEPI_PORT_THROTTLE_RIGHT, pwm_move_r);
-	analogWrite(GROVEPI_PORT_TURRET, pwm_move_t);
+	// analogWrite(GROVEPI_PORT_TURRET, pwm_move_t);
 
 }
 
@@ -192,7 +197,7 @@ cJSON * initiate_shoot() {
 void shoot_now() {
 	currently_shooting = 1;
 	digitalWrite(GROVEPI_PORT_GUN, 1);
-	usleep(1800);
+	usleep(1800000);
 	digitalWrite(GROVEPI_PORT_GUN, 0);
 	currently_shooting = 0;
 	printf("Shoot order completed.\n");
