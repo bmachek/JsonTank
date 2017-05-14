@@ -23,3 +23,5 @@ clean:
 	-rm -f *.o
 	-rm -f $(TARGET)
 
+install:
+	install $(TARGET) /usr/sbin
