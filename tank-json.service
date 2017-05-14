@@ -1,0 +1,11 @@
+[Unit]
+Description=JSON-Tank server 
+After=network.target
+[Service]
+Type=simple
+ExecStart=/usr/sbin/tank-json
+ExecStop=/usr/bin/killall tank-json
+Restart=yes
+[Install]
+WantedBy=multi-user.target
+
