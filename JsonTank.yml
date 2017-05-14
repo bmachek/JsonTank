@@ -1,0 +1,24 @@
+---
+- hosts: tanks
+  tasks:
+          - name: Check out JSON-Tank source code
+            git:
+                    repo: https://github.com/bmachek/JsonTank
+                    dest: /usr/src/JsonTank
+          - name: Compile JSON-Tank
+            make:
+                    chdir: /usr/src/JsonTank
+                    target: default
+          - name: Install JSON-Tank binary
+            make:
+                    chdir: /usr/src/JsonTank
+                    target: install
+            become: yes
+          - name: Install JSON-Tank systemd service.
+            shell: cp /usr/src/JsonTank/tank-json.service /etc/systemd/system/tank-json.service
+          - name: Enable and Start JSON-Tank service
+            systemd:
+                    name: tank-json
+                    enabled: yes
+                    state: started
+
