@@ -22,7 +22,7 @@
 #define DIRECTION_FORWARD 1
 #define DIRECTION_BACKWARD 0
 
-#define PWM_MIN 0.0
+#define PWM_MIN 16.0
 #define PWM_MAX 255.0
 
 #define GROVEPI_PORT_THROTTLE_LEFT 6
